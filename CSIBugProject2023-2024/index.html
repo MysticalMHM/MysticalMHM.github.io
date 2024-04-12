@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>CSI bug project 2023-2024</title>
+
+<style>
+
+body {
+	background: #1f1f1f;
+	color: #efefef;
+	font-family: "Monaco", monospace;
+}
+
+#top {
+	color: #09afaf;
+}
+
+.day {
+	margin: 1em 0 0 0;
+	font-size: 1.2em;
+	color: darkcyan;
+}
+
+.forecast {
+	margin: 0;
+	padding-left: 1.5em;
+}
+
+.noDisplay {
+	display: none;
+}
+
+</style>
+
+	</head>
+
+	<body>
+		<h1 id="top">
+			Bug Project Webapp
+		</h1>
+
+		<h2 style=
+				"margin: 0;">
+			<text id="daycount"></text> day forecast for <text id="userCoords"></text>:
+		</h2>
+
+		<div id="rawjson">
+			&lt;PLACEHOLDER&gt;
+		</div>
+
+<script>
+function getForecastURL(position) {
+	const lat = position.coords.latitude
+	const lon = position.coords.longitude
+	document.getElementById("userCoords").innerHTML = `${lat}, ${lon} (your location (I hope))`
+	var xhr = new XMLHttpRequest();
+	xhr.responseType = 
+			'application/geo+json'
+
+	xhr.open('GET',
+						`https://api.weather.gov/points/${lat},${lon}`
+					)
+
+	var forecastUrl;
+	xhr.send()
+	xhr.onload = () => {
+		console.log(xhr.response)
+		forecastUrl = JSON.parse(xhr.response).properties.forecast
+		getForecast(forecastUrl)
+	}
+}
+
+var jsonField =
+		document.getElementById("rawjson")
+
+alert("your location is used to get the forecast")
+
+navigator.geolocation.getCurrentPosition((position) => getForecastURL(position))
+
+console.clear()
+function getForecast(forecastUrl) {
+	var xhr = new XMLHttpRequest()
+	xhr.responseType =
+			'application/geo+json'
+
+	xhr.open('GET',
+							forecastUrl
+						 )
+
+	xhr.send()
+	xhr.onload = () => {
+		console.log(`Loaded: \nstatus: ${xhr.status} \ncontent: ${xhr.response}`);
+		document.getElementById("daycount").innerHTML = JSON.parse(xhr.response).properties.periods.length/2
+		jsonField.innerHTML = ''
+		for (i=0;i<JSON.parse(xhr.response).properties.periods.length;++i) {
+			jsonData = JSON.parse(xhr.response).properties.periods[i]
+			var precipProb = jsonData.probabilityOfPrecipitation.value != null ? jsonData.probabilityOfPrecipitation.value : 0
+			jsonField.innerHTML += `
+			<h4 class="day">${jsonData.name}:</h4>
+			<p class="forecast">PROBABILITY OF PRECIP: ${precipProb}%</p>
+			`
+		}
+	};
+}
+
+</script>
+
+	</body>
+</html>
