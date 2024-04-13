@@ -73,8 +73,6 @@ function getForecastURL(position) {
 var jsonField =
 		document.getElementById("rawjson")
 
-alert("your location is used to get the forecast")
-
 navigator.geolocation.getCurrentPosition((position) => getForecastURL(position))
 
 console.clear()
