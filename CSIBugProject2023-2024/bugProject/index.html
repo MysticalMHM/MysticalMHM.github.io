@@ -41,18 +41,18 @@ body {
 
 		<h2 style=
 				"margin: 0;">
-			<text id="daycount">7?</text> day forecast for <text id="userCoords">[YOUR LOCATION]</text>:
+			<text id="daycount"></text> day forecast for <text id="userCoords"></text>:
 		</h2>
 
 		<div id="rawjson">
-			&lt;FORECAST&gt;
+			&lt;PLACEHOLDER&gt;
 		</div>
 
 <script>
 function getForecastURL(position) {
 	const lat = position.coords.latitude
 	const lon = position.coords.longitude
-	document.getElementById("userCoords").innerHTML = `(latitude: ${lat}, longitude: ${lon})`
+	document.getElementById("userCoords").innerHTML = `${lat}, ${lon} (your location (I hope))`
 	var xhr = new XMLHttpRequest();
 	xhr.responseType = 
 			'application/geo+json'
@@ -72,6 +72,8 @@ function getForecastURL(position) {
 
 var jsonField =
 		document.getElementById("rawjson")
+
+alert("your location is used to get the forecast")
 
 navigator.geolocation.getCurrentPosition((position) => getForecastURL(position))
 
@@ -93,14 +95,9 @@ function getForecast(forecastUrl) {
 		for (i=0;i<JSON.parse(xhr.response).properties.periods.length;++i) {
 			jsonData = JSON.parse(xhr.response).properties.periods[i]
 			var precipProb = jsonData.probabilityOfPrecipitation.value != null ? jsonData.probabilityOfPrecipitation.value : 0
-			var temp = jsonData.temperature
-			var tempUnit = jsonData.temperatureUnit
-			var relHum = jsonData.relativeHumidity.value
 			jsonField.innerHTML += `
 			<h4 class="day">${jsonData.name}:</h4>
 			<p class="forecast">PROBABILITY OF PRECIP: ${precipProb}%</p>
-			<p class="forecast">TEMP: ${temp}°${tempUnit}</p>
-			<p class="forecast">RELATIVE HUMIDITY: ${relHum}%</p>
 			`
 		}
 	};
